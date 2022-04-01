@@ -79,8 +79,8 @@ team_summary = matches.groupby('team').agg(
                                       auto_cargo_upper_total = pd.NamedAgg(column = 'upper_hub_auto', aggfunc = 'sum' ),
                                       auto_cargo_lower_total = pd.NamedAgg(column = 'lower_hub_auto', aggfunc = 'sum' ),
                                       highest_climb_points = pd.NamedAgg(column='climb_points', aggfunc='max'),
-                                      first_avg = pd.NamedAgg(column='scouting_points', aggfunc = lambda x:  sum(x.head(FIRST_AVG))/FIRST_AVG if x.size >= TOTAL_AVG else 0),
-                                      first_few = pd.NamedAgg(column='scouting_points', aggfunc = lambda x: ",".join(str(i) for i in x.head(FIRST_AVG))),
+                                      #first_avg = pd.NamedAgg(column=['scouting_points','scouting_valid'], aggfunc = lambda x:  sum(x.head(FIRST_AVG))/FIRST_AVG if x.size >= TOTAL_AVG else 0),
+                                      #first_few = pd.NamedAgg(column='scouting_points', aggfunc = lambda x: ",".join(str(i) for i in x.head(FIRST_AVG))),
                                       last_few = pd.NamedAgg(column='scouting_points', aggfunc = lambda x: ",".join(str(i) for i in x.tail(LAST_AVG))),
                                       last_avg = pd.NamedAgg(column='scouting_points', aggfunc = lambda x: sum(x.tail(LAST_AVG))/LAST_AVG if x.size >=TOTAL_AVG else 0))
                                                          
@@ -98,7 +98,7 @@ team_summary.rename(columns={'valid_tba' : 'matches'  , 'valid_scouting' : 'scou
 team_summary=team_summary.merge(tba_oprs, on='team', how="left")
 team_summary=team_summary.merge(prescouting, on='team', how="left")
 team_summary.rename(columns={'OPR': 'pre_oprs','Climb Points' : 'pre_climb_points', 'District Ranking' : 'pre_district_rank', 'District Points Earned' : 'pre_district_points' } , inplace=True)
-team_summary=team_summary[['team','matches','scouted_matches','scouting_points_avg','climb_success_pct','climb_failure_pct','total_cargo_avg',
+team_summary=team_summary[['team','matches','scouted_matches','scouting_points_avg', 'first_avg','last_avg','climb_success_pct','climb_failure_pct','total_cargo_avg',
                            'auto_cargo_avg','teleop_cargo_avg','climb_points_avg','highest_endgame_position','oprs','pre_oprs', 'pre_climb_points', 'pre_district_rank', 'pre_district_points' ]]
 team_summary.to_csv("./data/team_summary.csv")
 

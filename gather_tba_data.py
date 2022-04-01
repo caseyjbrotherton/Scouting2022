@@ -90,8 +90,12 @@ for x in api_response:
         logger.debug(x)
       ra=x.alliances.to_dict()['red']
       ba=x.alliances.to_dict()['blue']
-      red=x.score_breakdown['red']
-      blue=x.score_breakdown['blue']
+      if ( x.score_breakdown is None ):
+        red = None
+        blue = None
+      else:  
+        red=x.score_breakdown['red']
+        blue=x.score_breakdown['blue']
       
       red1 = re.sub('frc','',ra['team_keys'][0])
       red2 = re.sub('frc','',ra['team_keys'][1])
@@ -104,7 +108,36 @@ for x in api_response:
          logger.warning('A match had dq teams.  Not sure what to do with this.  Match: %d' % x.match_number)
          logger.debug(ra)
          logger.debug(ba)
-      tba_matches.loc[len(tba_matches)] = {'match_number' : x.match_number, 
+        
+      if ( red is None or blue is None ):
+          # Match hasn't been played yet?
+          #logger.debug(x)
+          # TODO: more elegant way of doing this.  Maybe a list context?
+          tba_matches.loc[len(tba_matches)] = {'match_number' : x.match_number, 
+                         'post_result_time': "", 
+                         'predicted_time': time.strftime('%Y-%m-%d %H:%M', time.localtime(x.predicted_time)),
+                         'red1': red1, 'red2': red2, 'red3': red3,
+                         'red1_taxi': "", 'red2_taxi': "", 'red3_taxi': "", 
+                         'red1_climb': "None", 'red2_climb': "None" , 'red3_climb': "None",
+                         'red_points': 0,
+                         'red_fouls' : 0,
+                         'red_techfouls' : 0,
+                         'red_teleop_cargo' : 0,
+                         'red_auto_cargo' : 0,
+                         'red_teleop_low' : 0 ,
+                         'red_teleop_high' : 0 ,
+                         'blue1': blue1, 'blue2': blue2, 'blue3': blue3,
+                         'blue1_taxi': "", 'blue2_taxi': "", 'blue3_taxi': "", 
+                         'blue1_climb': "None", 'blue2_climb': "None", 'blue3_climb': "None",
+                         'blue_points': 0,
+                         'blue_fouls' : 0,
+                         'blue_techfouls' : 0,
+                         'blue_teleop_cargo' : 0,
+                         'blue_auto_cargo' : 0,
+                         'blue_teleop_low' : 0 ,
+                         'blue_teleop_high' : 0 }            
+      else:  
+          tba_matches.loc[len(tba_matches)] = {'match_number' : x.match_number, 
                          'post_result_time': time.strftime('%Y-%m-%d %H:%M', time.localtime(x.post_result_time)), 
                          'predicted_time': time.strftime('%Y-%m-%d %H:%M', time.localtime(x.predicted_time)),
                          'red1': red1, 'red2': red2, 'red3': red3,
