@@ -28,7 +28,7 @@ columns_required = ID_COLUMNS + VALUE_COLUMNS + DESC_COLUMNS
 df = pd.DataFrame(columns=columns_required)
 
 # Read all of the CSVs available in the current directory, and combine them
-for objective_file in glob.glob("objective*.csv"):
+for objective_file in glob.glob("./appdata/objective*.csv"):
      temp = pd.read_csv(objective_file,na_filter=False)
      df = pd.concat([df,temp])
 if ( df.empty ):
@@ -70,6 +70,7 @@ events = df.melt( id_vars = ID_COLUMNS,
                value_vars = VALUE_COLUMNS,
                var_name = 'event', 
                value_name = 'time')
+events['time'] = events['time'].apply( lambda x: f'{x};' if str(x).find(";") < 0 else x )
 events = events.assign(time=events.time.str.split(";")).explode('time')
 
 events = events[ events['time'] != '' ]
@@ -78,6 +79,7 @@ desc = df[ID_COLUMNS + DESC_COLUMNS]
 desc=desc.rename(columns={"Endgame_Position" : "endgame_position"})
 
 # Translate times into an integer to make easier comparisons.
+print(events)
 events['time'] = events['time'].astype(int)
 # create a new value for teleop, and auto that we can use to easily group by and aggregate
 events['auto'] = '_teleop'
@@ -94,4 +96,4 @@ match_summary=match_summary.merge(desc, on = ID_COLUMNS, how = 'left')
 
 # Write match summary that we can do further aggregation and analysis on later.  
 match_summary=match_summary.fillna(0)
-match_summary.to_csv('./data/app_matches.csv')
+match_summary.to_csv('./data/app_matches.csv', index=False)
